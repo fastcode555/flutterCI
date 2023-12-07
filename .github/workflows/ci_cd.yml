@@ -97,7 +97,7 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
         uses: actions/download-artifact@v2
         with:
           name: ${{ needs.build.outputs.project_info.project_name }}-android-release-${{ needs.build.outputs.project_info.version }}-${{ needs.build.outputs.project_info.build_time }}
-          path: build/app
+          path: build/app/outputs/flutter-apk/
 
       - name: Upload APK to GitHub Releases
         uses: actions/upload-release-asset@v1
