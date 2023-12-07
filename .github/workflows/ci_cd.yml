@@ -19,10 +19,10 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
     # 工作中的步骤，步骤会按照从上到下的顺序执行
     steps:
       - name: Checkout code  # 第一步，检出代码
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.5.1
 
       - name: Setup Flutter  # 第二步，设置Flutter环境
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v3
         with:
           flutter-version: '3.13.9'  # 指定Flutter版本号
 
@@ -57,10 +57,10 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
     runs-on: macos-latest  # 注意这里选择了macOS环境
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.5.1
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v3
         with:
           flutter-version: '3.13.9'
 
@@ -75,7 +75,7 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
         run: |
           echo "project_name=$(grep -o "name: [a-zA-Z_]*" pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
           echo "version=$(grep -o "version: [0-9.]*" pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
-          echo "build_time=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_ENV
+          echo "build_time=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
 
       - name: Build iOS  # 构建iOS版本
         run: |
