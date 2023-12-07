@@ -51,7 +51,7 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.project_name }}-android-release-${{ env.version }}-${{ env.build_time }}
-          path: build/app/outputs/flutter-apk/
+          path: build/app/outputs/flutter-apk/${{ env.project_name }}-android-release-${{ env.version }}-${{ env.build_time }}.apk
 
       - name: Create Release
         id: create_release
