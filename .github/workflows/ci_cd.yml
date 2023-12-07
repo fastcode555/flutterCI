@@ -38,8 +38,8 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
       - name: Build APK  # 第五步，构建APK
         run: |
           version=$(grep -o "version: [0-9.]*" pubspec.yaml | awk '{print $2}')
-          build_time=$(date +"%Y%m%d%H%M%S")
-          flutter build apk --release --build-name=$version --build-number=$build_time
+          build_time=$(date +"%Y_%m_%d")
+          flutter build apk --release --build-name=$version_$build_time
 
       - name: Archive production artifacts  # 第六步，归档产物，你可以在Actions的界面下载到这个文件
         uses: actions/upload-artifact@v2
