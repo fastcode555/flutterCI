@@ -38,19 +38,19 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
       - name: Extract project info #获取工程的信息
         id: project_info
         run: |
-          echo "::set-output name=project_name::$(grep -o "name: [a-zA-Z_]*" pubspec.yaml | awk '{print $2}')"
-          echo "::set-output name=version::$(grep -o "version: [0-9.]*" pubspec.yaml | awk '{print $2}')"
-          echo "::set-output name=build_time::$(date +"%Y_%m_%d")"
+          echo "project_name=$(grep -o "name: [a-zA-Z_]*" pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
+          echo "version=$(grep -o "version: [0-9.]*" pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
+          echo "build_time=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
 
-      - name: Build APK  # 第五步，构建APK
+      - name: Build APK  #构建APK
         run: |
           flutter build apk --release
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/${{ steps.project_info.outputs.project_name }}-release-${{ steps.project_info.outputs.version }}-${{ steps.project_info.outputs.build_time }}.apk
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/${{ env.project_name }}-android-release-${{ env.version }}-${{ env.build_time }}.apk
 
       - name: Archive production artifacts  # 第六步，归档产物，你可以在Actions的界面下载到这个文件
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ steps.project_info.outputs.project_name }}-release-${{ steps.project_info.outputs.version }}-${{ steps.project_info.outputs.build_time }}
+          name: ${{ env.project_name }}-android-release-${{ env.version }}-${{ env.build_time }}
           path: build/app/outputs/flutter-apk/
 
   build_ios:
@@ -70,41 +70,39 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build iOS
-        run: flutter build ios --release --no-codesign  # 构建iOS版本
+      - name: Extract project info
+        id: extract_info
+        run: |
+          echo "project_name=$(grep -o "name: [a-zA-Z_]*" pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
+          echo "version=$(grep -o "version: [0-9.]*" pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
+          echo "build_time=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_ENV
+
+      - name: Build iOS  # 构建iOS版本
+        run: |
+          flutter build ios --release --no-codesign
+          mv build/ios/iphoneos/Runner.app build/ios/iphoneos/${{ env.project_name }}-ios-release-${{ env.version }}-${{ env.build_time }}.app
 
       - name: Archive iOS
         uses: actions/upload-artifact@v2
         with:
-          name: release-ios
-          path: build/ios/iphoneos/Runner.app  # iOS应用的路径
+          name: ${{ env.project_name }}-ios-release-${{ env.version }}-${{ env.build_time }}
+          path: build/ios/iphoneos/${{ env.project_name }}-ios-release-${{ env.version }}-${{ env.build_time }}.app  # iOS应用的路径
 
   deploy: # 这是第二个工作的名称，你可以自行定义
     # 这个工作需要在build_and_test工作成功后才会运行
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
+      - name: Download APK artifact
+        uses: actions/download-artifact@v2
         with:
-          flutter-version: '3.13.9'
+          name: ${{ needs.build.outputs.project_info.project_name }}-android-release-${{ needs.build.outputs.project_info.version }}-${{ needs.build.outputs.project_info.build_time }}
+          path: build/app
 
-      - name: Check Flutter Version
-        run: flutter --version
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk
-
-      - name: Deploy to Release  # 最后，部署到你的发布页面或者服务器
-        # 这个部分取决于你使用什么方式来发布你的应用
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          echo "Deploying version $VERSION"
-          # 这里添加你的部署代码
+      - name: Upload APK to GitHub Releases
+        uses: actions/upload-release-asset@v1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/app/outputs/flutter-apk/${{ needs.build.outputs.project_info.project_name }}-android-release-${{ needs.build.outputs.project_info.version }}-${{ needs.build.outputs.project_info.build_time }}.apk
+          asset_name: "${{ needs.build.outputs.project_info.project_name }}-android-release-${{ needs.build.outputs.project_info.version }}-${{ needs.build.outputs.project_info.build_time }}.apk"
+          tag: ${{ github.ref }}
