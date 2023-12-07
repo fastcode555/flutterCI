@@ -18,9 +18,6 @@ jobs:  # 定义了一系列的工作，这些工作可以并行执行，也可�
     runs-on: ubuntu-latest
     # 工作中的步骤，步骤会按照从上到下的顺序执行
     steps:
-      - name: Check Flutter Version
-        run: flutter --version
-
       - name: Checkout code  # 第一步，检出代码
         uses: actions/checkout@v2
 
@@ -28,6 +25,9 @@ jobs:  # 定义了一系列的工作，这些工作可以并行执行，也可�
         uses: subosito/flutter-action@v1
         with:
           flutter-version: '3.13.9'  # 指定Flutter版本号
+
+      - name: Check Flutter Version
+        run: flutter --version
 
       - name: Install dependencies  # 第三步，安装依赖
         run: flutter pub get
@@ -46,9 +46,6 @@ jobs:  # 定义了一系列的工作，这些工作可以并行执行，也可�
   build_ios:
     runs-on: macos-latest  # 注意这里选择了macOS环境
     steps:
-      - name: Check Flutter Version
-        run: flutter --version
-
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -56,6 +53,9 @@ jobs:  # 定义了一系列的工作，这些工作可以并行执行，也可�
         uses: subosito/flutter-action@v1
         with:
           flutter-version: '3.13.9'
+
+      - name: Check Flutter Version
+        run: flutter --version
 
       - name: Install dependencies
         run: flutter pub get
@@ -74,8 +74,6 @@ jobs:  # 定义了一系列的工作，这些工作可以并行执行，也可�
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
-      - name: Check Flutter Version
-        run: flutter --version
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -84,6 +82,9 @@ jobs:  # 定义了一系列的工作，这些工作可以并行执行，也可�
         uses: subosito/flutter-action@v1
         with:
           flutter-version: '3.13.9'
+
+      - name: Check Flutter Version
+        run: flutter --version
 
       - name: Install dependencies
         run: flutter pub get
