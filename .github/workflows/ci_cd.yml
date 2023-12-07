@@ -35,17 +35,24 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
       - name: Run tests  # 第四步，运行测试
         run: flutter test
 
+      - name: Extract project info #获取工程的信息
+        id: project_info
+        run: |
+          echo "::set-output name=project_name::$(grep -o "name: [a-zA-Z_]*" pubspec.yaml | awk '{print $2}')"
+          echo "::set-output name=version::$(grep -o "version: [0-9.]*" pubspec.yaml | awk '{print $2}')"
+          echo "::set-output name=build_time::$(date +"%Y_%m_%d")"
+
       - name: Build APK  # 第五步，构建APK
         run: |
-          version=$(grep -o "version: [0-9.]*" pubspec.yaml | awk '{print $2}')
-          build_time=$(date +"%Y_%m_%d")
-          flutter build apk --release --build-name=$version_$build_time
+          flutter build apk --release
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/${{ steps.project_info.outputs.project_name }}-release-${{ steps.project_info.outputs.version }}-${{ steps.project_info.outputs.build_time }}.apk
 
       - name: Archive production artifacts  # 第六步，归档产物，你可以在Actions的界面下载到这个文件
         uses: actions/upload-artifact@v2
         with:
-          name: release-$version
+          name: ${{ steps.project_info.outputs.project_name }}-release-${{ steps.project_info.outputs.version }}-${{ steps.project_info.outputs.build_time }}
           path: build/app/outputs/flutter-apk/
+
   build_ios:
     runs-on: macos-latest  # 注意这里选择了macOS环境
     steps:
