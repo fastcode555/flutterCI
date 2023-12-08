@@ -166,16 +166,19 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
       - name: Build macOS app
         run: flutter build macos
 
-      #      - name: Archive macOS app
-      #        uses: actions/upload-artifact@v2
-      #        with:
-      #          name: macos-app
-      #          path: build/macos/Build/Products/Release/
-      - name: Check python version
-        run: npm config get python
+      - name: Archive macOS app
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.project_name }}-macos-release-${{ env.version }}-${{ env.build_time }}
+          path: build/macos/Build/Products/Release/${{ env.project_name }}.app
+      #      - name: Check python version
+      #        run: npm config get python
+      #
+      #      - name: Config python3
+      #        run: npm config set python python3
 
-      - name: Config python3
-        run: npm config set python python3
+      - name: Check Python version
+        run: python3 --version
 
       - name: Install create-dmg
         run: npm install -g create-dmg
