@@ -177,6 +177,11 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
       #      - name: Config python3
       #        run: npm config set python python3
 
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11.5'
+
       - name: Check Python version
         run: python3 --version
 
