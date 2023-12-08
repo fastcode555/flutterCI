@@ -13,7 +13,8 @@ on:
       - 'v*'  # 当推送的标签名以v开头时，触发工作流，这常用于发布新版本
 
 jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以按照依赖顺序执行
-  build_and_test: # 这是第一个工作的名称，你可以自行定义
+  #增加android打包的流程
+  build_android: # 这是第一个工作的名称，你可以自行定义
     # 工作运行的环境
     runs-on: ubuntu-latest
     # 工作中的步骤，步骤会按照从上到下的顺序执行
@@ -75,6 +76,7 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
           asset_name: "${{ env.project_name }}-android-release-${{ env.version }}-${{ env.build_time }}.apk"
           asset_content_type: application/octet-stream
 
+  # 增加ios打包的流程
   build_ios:
     runs-on: macos-latest  # 注意这里选择了macOS环境
     steps:
@@ -133,6 +135,54 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
           asset_name: "${{ env.project_name }}-ios-release-${{ env.version }}-${{ env.build_time }}.app.zip"
           asset_content_type: application/octet-stream
 
+  # 增加macos打包的流程
+  build_macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.13.9'
+
+      - name: Check Flutter Version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Extract project info
+        id: extract_info
+        run: |
+          echo "project_name=$(grep -o "name: [a-zA-Z_]*" pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
+          echo "version=$(grep -o "version: [0-9.]*" pubspec.yaml | awk '{print $2}')" >> $GITHUB_ENV
+          echo "build_time=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
+
+      - name: Build macOS app
+        run: flutter build macos
+
+      #      - name: Archive macOS app
+      #        uses: actions/upload-artifact@v2
+      #        with:
+      #          name: macos-app
+      #          path: build/macos/Build/Products/Release/
+
+      - name: Install create-dmg
+        run: npm install -g create-dmg
+
+      - name: Create DMG
+        run: create-dmg 'build/macos/Products/Release/${{ env.project_name }}.app' --overwrite --dmg-title='${{ $env.project_name }}'
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.project_name }}-macos-release-${{ env.version }}-${{ env.build_time }}
+          path: build/macos/Products/Release/${{ env.project_name }}.dmg
 #  deploy: # 这是第二个工作的名称，你可以自行定义
 #    # 这个工作需要在build_and_test工作成功后才会运行
 #    needs: build_and_test
