@@ -197,7 +197,7 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
         run: ls build/macos/Build/Products/Release/
 
       - name: Create DMG
-        run: create-dmg 'build/macos/Build/Products/Release/${{ env.project_name }}.app' --overwrite --dmg-title='${{ env.project_name }}'
+        run: create-dmg 'build/macos/Build/Products/Release/${{ env.project_name }}.app' --overwrite --dmg-title='${{ env.project_name }}' --no-sign
 
       - name: Upload DMG
         uses: actions/upload-artifact@v2
