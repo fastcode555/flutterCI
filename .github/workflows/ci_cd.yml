@@ -110,6 +110,28 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
           name: ${{ env.project_name }}-ios-release-${{ env.version }}-${{ env.build_time }}
           path: build/ios/iphoneos/${{ env.project_name }}-ios-release-${{ env.version }}-${{ env.build_time }}.app  # iOS应用的路径
 
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.version }}-${{ env.build_time }}
+          release_name: Release ${{ env.version }}-${{ env.build_time }}
+          body: |
+            Release notes and changelog go here.
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/ios/iphoneos/${{ env.project_name }}-ios-release-${{ env.version }}-${{ env.build_time }}.app
+          asset_name: "${{ env.project_name }}-ios-release-${{ env.version }}-${{ env.build_time }}.app"
+          asset_content_type: application/octet-stream
+
 #  deploy: # 这是第二个工作的名称，你可以自行定义
 #    # 这个工作需要在build_and_test工作成功后才会运行
 #    needs: build_and_test
