@@ -176,7 +176,7 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
         run: npm install -g create-dmg
 
       - name: Create DMG
-        run: create-dmg 'build/macos/Products/Release/${{ env.project_name }}.app' --overwrite --dmg-title='${{ $env.project_name }}'
+        run: create-dmg 'build/macos/Products/Release/${{ env.project_name }}.app' --overwrite --dmg-title='${{ env.project_name }}'
 
       - name: Upload DMG
         uses: actions/upload-artifact@v2
