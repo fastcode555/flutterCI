@@ -171,9 +171,6 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
       #        with:
       #          name: macos-app
       #          path: build/macos/Build/Products/Release/
-      - name: Install distutils
-        run: pip3 install distutils
-
       - name: Check python version
         run: npm config get python
 
