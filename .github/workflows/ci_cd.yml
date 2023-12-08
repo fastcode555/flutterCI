@@ -59,8 +59,8 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.version }}-${{ env.build_time }}
-          release_name: Release ${{ env.version }}-${{ env.build_time }}
+          tag_name: v${{ env.version }}-${{ env.build_time }}-android
+          release_name: Release-android ${{ env.version }}-${{ env.build_time }}
           body: |
             Release notes and changelog go here.
 
@@ -116,8 +116,8 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.version }}-${{ env.build_time }}
-          release_name: Release ${{ env.version }}-${{ env.build_time }}
+          tag_name: v${{ env.version }}-${{ env.build_time }}-ios
+          release_name: Release-ios ${{ env.version }}-${{ env.build_time }}
           body: |
             Release notes and changelog go here.
 
