@@ -180,6 +180,11 @@ jobs: # 定义了一系列的工作，这些工作可以并行执行，也可以
       - name: Check Python version
         run: python3 --version
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16.13.0'
+
       - name: Install create-dmg
         run: npm install -g create-dmg
 
